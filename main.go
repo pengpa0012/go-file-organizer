@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path/filepath"
 	"strings"
 )
 func main() {
@@ -17,9 +18,9 @@ func main() {
 		if line[:len(line)-1] == "close" {
 			fmt.Println("Exiting the program.")
 			break
-		}
-
-		if line[:len(line)-1] == "show" {
+		} else if line[:len(line)-1] == "back" {
+			changeDirectory()
+		} else if line[:len(line)-1] == "show" {
 			showDirectories()
 		} else {
 			fmt.Println("Invalid command. Try again.")
@@ -48,3 +49,12 @@ func showDirectories() {
 	}
 }
 
+func changeDirectory() {
+	currentDir, err := os.Getwd()
+	if err != nil {
+		fmt.Println("Error getting current directory:", err)
+		return
+	}
+	newPath := filepath.Dir(currentDir)
+	os.Chdir(newPath)
+}
