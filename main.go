@@ -9,6 +9,7 @@ import (
 	"strings"
 )
 func main() {
+	displayDirectory()
 	for {
 		line := readLine()
 		// Remove white spaces and new line on user input
@@ -27,12 +28,14 @@ func main() {
 			deleteDirectory(strings.Fields(line)[1])
 		} else if strings.Fields(line)[0] == "update" && strings.Fields(line)[1] != "" && strings.Fields(line)[2] != "" {
 			updateDirectoryname(strings.Fields(line)[1], strings.Fields(line)[2])
+		}  else if strings.Fields(line)[0] == "move" && strings.Fields(line)[1] != "" && strings.Fields(line)[2] != "" {
+			moveDirectory(strings.Fields(line)[1], strings.Fields(line)[2])
 		}  else if line[:len(line)-1] == "show" {
 			showDirectories()
 		} else {
 			fmt.Println("Invalid command. Try again.")
 		}
-
+		displayDirectory()
 	}
 }
 
@@ -91,6 +94,7 @@ func selectDirectory(path string) {
 }
 
 func createDirectory(name string) {
+	// check if has extension if yes create that file else directory
 	err := os.Mkdir(name, 0750)
 	if err != nil && !os.IsExist(err) {
 		log.Fatal(err)
@@ -98,6 +102,7 @@ func createDirectory(name string) {
 }
 
 func deleteDirectory(directory string) {
+	// add checking if file or directory
 	currentDir, err := os.Getwd()
 	if err != nil {
 		fmt.Println("Error getting current directory:", err)
@@ -112,7 +117,6 @@ func deleteDirectory(directory string) {
 }
 
 func updateDirectoryname(oldpath string, newPath string) {
-	
 	currentDir, err := os.Getwd()
 	if err != nil {
 		fmt.Println("Error getting current directory:", err)
@@ -121,9 +125,38 @@ func updateDirectoryname(oldpath string, newPath string) {
 
 	updatedDirectory := filepath.Join(currentDir, newPath)
 	oldDirectory := filepath.Join(currentDir, oldpath)
-
-	e := os.Rename(oldDirectory, updatedDirectory) 
-	if e != nil { 
-			log.Fatal(e) 
+	 
+	if err := os.Rename(oldDirectory, updatedDirectory); err != nil { 
+			log.Fatal(err) 
 	} 
+}
+
+func moveDirectory(name string, path string) { 
+	// Get the absolute path of the current working directory
+	currentDir, err := os.Getwd()
+	if err != nil {
+		fmt.Println("Error getting current directory:", err)
+		return
+	}
+
+	// Resolve the destination path to an absolute path
+	selectedDirectory := filepath.Join(currentDir, name)
+	updatedDirectory := filepath.Join(currentDir, path)
+	
+	// Move the directory
+	if err = os.Rename(selectedDirectory, updatedDirectory); err != nil {
+		fmt.Println("Error moving current directory:", err)
+		return 
+	}
+
+	fmt.Printf("Moved directory %s to %s\n", name, updatedDirectory)
+}
+
+func displayDirectory() {
+	currentDir, err := os.Getwd()
+	if err != nil {
+		fmt.Println("Error getting current directory:", err)
+		return
+	}
+	fmt.Println(currentDir)
 }
