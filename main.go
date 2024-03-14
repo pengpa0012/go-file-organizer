@@ -21,12 +21,14 @@ func main() {
 			changeDirectory()
 		} else if strings.Fields(line)[0] == "select" && strings.Fields(line)[1] != "" {
 			moveDirectory(strings.Fields(line)[1])
+		} else if strings.Fields(line)[0] == "create" && strings.Fields(line)[1] != "" {
+			createDirectory(strings.Fields(line)[1])
 		} else if line[:len(line)-1] == "show" {
 			showDirectories()
 		} else {
 			fmt.Println("Invalid command. Try again.")
 		}
-		
+
 	}
 }
 
@@ -57,6 +59,7 @@ func changeDirectory() {
 		fmt.Println("Error getting current directory:", err)
 		return
 	}
+
 	newPath := filepath.Dir(currentDir)
 	os.Chdir(newPath)
 }
@@ -80,5 +83,11 @@ func moveDirectory(path string) {
 	} else {
 		fmt.Println("Invalid directory:", err)
 		return
+	}
+}
+func createDirectory(name string) {
+	err := os.Mkdir(name, 0750)
+	if err != nil && !os.IsExist(err) {
+		log.Fatal(err)
 	}
 }
