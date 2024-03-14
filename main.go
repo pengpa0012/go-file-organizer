@@ -25,7 +25,9 @@ func main() {
 			createDirectory(strings.Fields(line)[1])
 		} else if strings.Fields(line)[0] == "delete" && strings.Fields(line)[1] != "" {
 			deleteDirectory(strings.Fields(line)[1])
-		} else if line[:len(line)-1] == "show" {
+		} else if strings.Fields(line)[0] == "update" && strings.Fields(line)[1] != "" && strings.Fields(line)[2] != "" {
+			updateDirectoryname(strings.Fields(line)[1], strings.Fields(line)[2])
+		}  else if line[:len(line)-1] == "show" {
 			showDirectories()
 		} else {
 			fmt.Println("Invalid command. Try again.")
@@ -107,4 +109,21 @@ func deleteDirectory(directory string) {
 		fmt.Println("Invalid directory:", err)
 		return
 	}
+}
+
+func updateDirectoryname(oldpath string, newPath string) {
+	
+	currentDir, err := os.Getwd()
+	if err != nil {
+		fmt.Println("Error getting current directory:", err)
+		return
+	}
+
+	updatedDirectory := filepath.Join(currentDir, newPath)
+	oldDirectory := filepath.Join(currentDir, oldpath)
+
+	e := os.Rename(oldDirectory, updatedDirectory) 
+	if e != nil { 
+			log.Fatal(e) 
+	} 
 }
