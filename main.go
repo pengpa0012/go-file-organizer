@@ -20,9 +20,11 @@ func main() {
 		} else if line[:len(line)-1] == "back" {
 			changeDirectory()
 		} else if strings.Fields(line)[0] == "select" && strings.Fields(line)[1] != "" {
-			moveDirectory(strings.Fields(line)[1])
+			selectDirectory(strings.Fields(line)[1])
 		} else if strings.Fields(line)[0] == "create" && strings.Fields(line)[1] != "" {
 			createDirectory(strings.Fields(line)[1])
+		} else if strings.Fields(line)[0] == "delete" && strings.Fields(line)[1] != "" {
+			deleteDirectory(strings.Fields(line)[1])
 		} else if line[:len(line)-1] == "show" {
 			showDirectories()
 		} else {
@@ -64,7 +66,7 @@ func changeDirectory() {
 	os.Chdir(newPath)
 }
 
-func moveDirectory(path string) {
+func selectDirectory(path string) {
 	fileInfo, err := os.Stat(path)
 	if err != nil {
 		fmt.Println("Invalid directory:", err)
@@ -85,9 +87,24 @@ func moveDirectory(path string) {
 		return
 	}
 }
+
 func createDirectory(name string) {
 	err := os.Mkdir(name, 0750)
 	if err != nil && !os.IsExist(err) {
 		log.Fatal(err)
+	}
+}
+
+func deleteDirectory(directory string) {
+	currentDir, err := os.Getwd()
+	if err != nil {
+		fmt.Println("Error getting current directory:", err)
+		return
+	}
+
+	newPath := filepath.Join(currentDir, directory)
+	if err := os.RemoveAll(newPath); err != nil {
+		fmt.Println("Invalid directory:", err)
+		return
 	}
 }
